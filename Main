@@ -1,0 +1,50 @@
+import requests
+import json
+import csv
+import time
+
+start_time = time.time()
+
+with open('MasterCardList.csv') as masterCardList:
+    csv_reader = csv.reader(masterCardList, delimiter=',')
+
+    for row in csv_reader:
+
+        try:
+
+            url=row[0]
+            # url = "https://api.x.immutable.com/v1/orders?page_size=10&order_by=buy_quantity&direction=asc&status=active&sell_token_address=0xacb3c6a43d15b907e8433077b6d38ae40936fe2c&sell_token_name=Thunder%20Caller"
+            headers = {"Accept": "*/*"}
+
+
+            response = requests.request("GET", url, headers=headers)
+
+            sampleDict = json.loads(response.text)
+
+            #outDict = {}
+
+            for result in sampleDict["result"]:
+                # print(card_name + ", " + str(quantity) + ", " + result["sell"]["data"]["quantity"])
+
+                card1 = (int(sampleDict["result"][0]["buy"]["data"]["quantity"]))
+                card2 = (int(sampleDict["result"][1]["buy"]["data"]["quantity"]))
+                discount = ((card2-card1)/card2)*100
+
+            if (discount > 15):
+                card_name = result["sell"]["data"]["properties"]["name"]
+                quantity = card1/1000000000000000000
+                print(str(card_name) + " | Cheapest Price: " + str(quantity) + " | Discount: " + str(discount))
+                # print(quantity)
+                # print(((card2-card1)/card2)*100)
+
+        except:
+            pass
+
+print("--- %s seconds ---" % (time.time() - start_time))
+
+# print(y["result"][0]["sell"]["data"]["properties"]["name"])
+# print(int(y["result"][0]["buy"]["data"]["quantity"])/1000000000000000000)
+#
+# print(y["result"][1]["sell"]["data"]["properties"]["name"])
+# print(int(y["result"][1]["buy"]["data"]["quantity"])/1000000000000000000)
+
